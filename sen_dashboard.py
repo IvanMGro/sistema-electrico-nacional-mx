@@ -935,11 +935,15 @@ def main():
     else:
         st.warning("Column 'nom_ent' not found in the dataset")
 
-    # Create tabs
-    tab1, tab2, tab3 = st.tabs(["Mapa Interactivo", "Resumen Nacional", "Resumen por Estado"])
-    
-    # Tab 1: Map (existing functionality with year filter)
-    with tab1:
+    # Render one page at a time to avoid cross-page UI bleed on reruns.
+    page = st.sidebar.radio(
+        "Navegación",
+        ["Mapa Interactivo", "Resumen Nacional", "Resumen por Estado"],
+        key="active_page",
+    )
+
+    # Page 1: Map (existing functionality with year filter)
+    if page == "Mapa Interactivo":
         st.header("Mapa interactivo")
         
         # Prepare filter options
@@ -1080,9 +1084,9 @@ def main():
         st.info(f"Mostrando {len(filtered)} plantas en operación hasta el año {st.session_state.selected_year}")
         components.html(map_obj.get_root().render(), height=800, scrolling=False)
         st.caption("Mapa creado por Iván Montenegro. Capas geográficas provenientes de Geocomunes. Datos actualizados hasta 2023. Posteriormente se agregan plantas en proyecto del plan de expansión de CFE y esquema mixto.")
-    
-    # Tab 2: National Summary
-    with tab2:
+
+    # Page 2: National Summary
+    elif page == "Resumen Nacional":
         st.header("Resumen Nacional del Sistema Eléctrico Nacional")
         
         col1, col2 = st.columns(2)
@@ -1160,9 +1164,9 @@ def main():
             )
             fig_tech_ranking.update_layout(xaxis_tickangle=-45, height=500)
             st.plotly_chart(fig_tech_ranking, use_container_width=True)
-    
-    # Tab 3: State Summary
-    with tab3:
+
+    # Page 3: State Summary
+    else:
         st.header("Resumen por Estado")
         
         if 'nom_ent' in gdf_plantas.columns:
