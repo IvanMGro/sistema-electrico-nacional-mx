@@ -710,7 +710,7 @@ def create_donut_chart(data, title, value_col='capacity', name_col='technology')
 
 def main():
     st.set_page_config(layout="wide", page_title="Infraestructura - Análisis")
-    st.title("Sistema Eléctrico Nacional - Análisis de Capacidad")
+    st.title("Sistema Eléctrico Nacional")
 
     # sensible defaults relative to this script's directory
     base_dir = os.path.dirname(__file__)
@@ -940,7 +940,7 @@ def main():
     
     # Tab 1: Map (existing functionality with year filter)
     with tab1:
-        st.header("Mapa interactivo - Plantas y Líneas de Transmisión")
+        st.header("Mapa interactivo")
         
         # Prepare filter options
         permiso_opts = []
