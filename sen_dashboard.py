@@ -26,6 +26,27 @@ TECH_MAPPING = {
 }
 
 
+def resolve_existing_path(base_dir: str, *parts: str) -> str:
+    """Resolve a path even if casing differs across filesystems (macOS vs Linux)."""
+    candidate = os.path.join(base_dir, *parts)
+    if os.path.exists(candidate):
+        return candidate
+
+    current = base_dir
+    for part in parts:
+        try:
+            entries = {name.lower(): name for name in os.listdir(current)}
+        except Exception:
+            return candidate
+
+        matched = entries.get(part.lower())
+        if matched is None:
+            return candidate
+        current = os.path.join(current, matched)
+
+    return current
+
+
 @st.cache_data
 def load_and_process_plants(plants_path: str):
     """Load and prepare plant data with all derived columns."""
@@ -714,14 +735,14 @@ def main():
 
     # sensible defaults relative to this script's directory
     base_dir = os.path.dirname(__file__)
-    default_plants = os.path.join(base_dir, "Electricidad", "Centrales_Electricas_PLANEAS_Feb_2024", "Centrales_Electricas_PLANEAS_Feb_2024.shp")
-    default_lines = os.path.join(base_dir, "Electricidad", "LT_Operacion_Abril2024", "LT_Operacion_Abril2024.shp")
+    default_plants = resolve_existing_path(base_dir, "Electricidad", "Centrales_Electricas_PLANEAS_Feb_2024", "Centrales_Electricas_PLANEAS_Feb_2024.shp")
+    default_lines = resolve_existing_path(base_dir, "Electricidad", "LT_Operacion_Abril2024", "LT_Operacion_Abril2024.shp")
     
     # Additional layers paths
-    default_pasos = os.path.join(base_dir, "Gas", "Gas_Puntos_Interconexion", "Pasos_fronterizos_gas_metano.shp")
-    default_gnl = os.path.join(base_dir, "Gas", "Terminales_GNL", "Terminales_GNL_Mexico.shp")
-    default_sistrangas = os.path.join(base_dir, "Gas", "Gasoductos_SISTRANGAS", "gasoductos_sng.shp")
-    default_privados = os.path.join(base_dir, "Gas", "Gasoductos_privados", "Gasoductos_privados.shp")
+    default_pasos = resolve_existing_path(base_dir, "Gas", "Gas_Puntos_Interconexion", "Pasos_fronterizos_gas_metano.shp")
+    default_gnl = resolve_existing_path(base_dir, "Gas", "Terminales_GNL", "Terminales_GNL_Mexico.shp")
+    default_sistrangas = resolve_existing_path(base_dir, "Gas", "Gasoductos_SISTRANGAS", "gasoductos_sng.shp")
+    default_privados = resolve_existing_path(base_dir, "Gas", "Gasoductos_Privados", "Gasoductos_privados.shp")
 
     plants_path = default_plants
     lines_path = default_lines
